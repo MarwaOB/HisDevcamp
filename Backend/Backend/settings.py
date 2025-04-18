@@ -33,8 +33,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'ai',
     'corsheaders',
-    'users.apps.UsersConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -87,15 +87,8 @@ WSGI_APPLICATION = 'Backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  
-        'NAME': 'Jm3etna',         
-        'USER': 'admin',            
-        'PASSWORD': '0123456789',    
-        'HOST': 'localhost',                  
-        'PORT': '3306',                        
-        'OPTIONS': {
-            'charset': 'utf8mb4',              
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -153,4 +146,3 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'backend', 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'users.CustomUser'
