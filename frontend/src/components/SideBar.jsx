@@ -1,68 +1,56 @@
-import React, { useState } from "react";
-import logo from "../assets/Group.png";
+import { Link, useLocation } from "react-router-dom";
+import HomeIcon from "../assets/home.png";
+import ChartIcon from "../assets/Sales.png";
+import UserIcon from "../assets/Account.png";
+import DrahamIcon from "../assets/Draham.png";
+import LogoutIcon from "../assets/log-out.png";
 
-const Navbar = () => {
-  const [clicked, setClicked] = useState(null); // null par défaut pour éviter l'état de base
-
-  const handleClick = (button) => {
-    setClicked(button);
-  };
+export default function Sidebar() {
+  const location = useLocation();
+  const currentPath = location.pathname.split("/")[1] || "home";
 
   return (
-    <nav className="w-full flex flex-wrap justify-between items-center py-4 px-8 pt-[0px] bg-white">
+    <div className="w-[200px] ml-[10px] mt-[10px] h-screen bg-[rgb(40,136,122)] rounded flex flex-col justify-between">
       {/* Logo */}
-      <img src={logo} alt="StockFlow Logo" className="h-[50px] ml-[-50px]" />
-
-      {/* Menu */}
-      <ul className="flex flex-wrap gap-6 text-gray-700 text-base">
-  <li>
-    <a href="#" className="hover:text-[#FFD476] active:underline active:decoration-[#28887A]">
-      About
-    </a>
-  </li>
-  <li>
-    <a href="#" className="hover:text-[#FFD476] active:underline active:decoration-[#28887A]">
-      Services
-    </a>
-  </li>
-  <li>
-    <a href="#" className="hover:text-[#FFD476] active:underline active:decoration-[#28887A]">
-      Testimonials
-    </a>
-  </li>
-  <li>
-    <a href="#" className="hover:text-[#FFD476] active:underline active:decoration-[#28887A]">
-      Get Started
-    </a>
-  </li>
-  <li>
-    <a href="#" className="hover:text-[#FFD476] active:underline active:decoration-[#28887A]">
-      Jobs
-    </a>
-  </li>
-</ul>
-
-
-      {/* Buttons */}
-      <div className="flex gap-4 mt-4 md:mt-0">
-        {/* Sign In Button */}
-        <button
-          className={`px-4 font-medium rounded transform transition-all duration-200 hover:scale-105 text-[#28887A] border-1 border-[#28887A] ${clicked === 'signIn' ? 'text-[#28887A] border-[#28887A] hover:text-[#28887A]' : 'hover:text-[#28887A]'}`}
-          onClick={() => handleClick('signIn')}
+      <div>
+        <div
+          className="flex items-center gap-1 text-white text-2xl font-light p-4"
+          style={{ fontFamily: "'Playfair Display', serif" }}
         >
-          Sign In
-        </button>
+          <span className="text-3xl text-center font-bold text-black">StockFlow</span>
+        </div>
 
-        {/* Sign Up Button */}
-        <button
-          className={`text-white px-4 py-2 rounded transform transition-all duration-200 hover:scale-105 bg-[#28887A] ${clicked === 'signUp' ? 'text-white' : 'hover:text-[#ffffff] hover:bg-[#28887A]'}`}
-          onClick={() => handleClick('signUp')}
-        >
-          Sign Up
-        </button>
+        <div className="h-[20px]"></div>
+
+        {/* Navigation items */}
+        <nav className="flex flex-col gap-3 px-2">
+          <SidebarItem icon={HomeIcon} label="Home" to="/home" active={currentPath === "home"} />
+          <SidebarItem icon={ChartIcon} label="Dashboard" to="/dashboard" active={currentPath === "dashboard"} />
+          <SidebarItem icon={DrahamIcon} label="Pricing" to="/pricing" active={currentPath === "pricing"} />
+          <SidebarItem icon={UserIcon} label="Profil" to="/profil" active={currentPath === "profil"} />
+        </nav>
       </div>
-    </nav>
-  );
-};
 
-export default Navbar;
+      {/* Footer / Disconnect */}
+      <div className="px-2 pb-4 w-full">
+        <SidebarItem icon={LogoutIcon} label="Disconnect" to="/disconnect" active={currentPath === "disconnect"} />
+      </div>
+    </div>
+  );
+}
+
+// Sidebar item component
+function SidebarItem({ icon, label, to, active }) {
+  return (
+    <Link
+      to={to}
+      className={`flex items-center gap-3 py-2 px-4 rounded transition-all duration-200 ${
+        active ? "text-white" : "bg-white text-teal-700 hover:text-teal-800"
+      }`}
+      style={active ? { backgroundColor: "rgba(40, 136, 122, 0.5)" } : {}}
+    >
+      <img src={icon} alt={`${label} icon`} className="w-4 h-4" />
+      <span className="text-sm">{label}</span>
+    </Link>
+  );
+}
