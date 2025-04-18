@@ -1,37 +1,35 @@
-import numpy as np
 import pandas as pd
+import numpy as np
 
-
-
-
-def preprocess_data(data):
+def preprocess_train_data(data):
     data = data.copy()
 
-    # Construct datetime from year and week number (ISO format expects '-Wxx-1' for Monday)
+    # Add missing fields
+    data['year'] = 2025
+    data['week_num'] = 1
+
+    # Convert to datetime
     data['week_start'] = pd.to_datetime(
         data['year'].astype(str) + '-W' + data['week_num'].astype(str) + '-1',
         errors='coerce'
     )
 
-    # Skip week_start entirely
-    data['weekofyear'] = data['week_num']
-
-    # Sinusoidal encoding
+    data['weekofyear'] = data['week_start'].dt.isocalendar().week
     data['week_sin'] = np.sin(2 * np.pi * data['weekofyear'] / 52)
     data['week_cos'] = np.cos(2 * np.pi * data['weekofyear'] / 52)
-
-    # Discount calculation
     data['discount'] = (data['base_price'] - data['total_price']) / data['base_price']
     data['discount'] = data['discount'].fillna(0)
 
     # One-hot encode categorical variables
     data = pd.get_dummies(data, columns=['store_id', 'sku_id'])
 
-    # Feature selection
-    features = [
-        'total_price', 'base_price', 'is_featured_sku', 'is_display_sku',
-        'discount', 'week_sin', 'week_cos'
-    ]
+    # Select relevant features
+    features = ['total_price', 'base_price', 'is_featured_sku', 'is_display_sku',
+                'discount', 'week_sin', 'week_cos']
     features += [col for col in data.columns if col.startswith('store_id_') or col.startswith('sku_id_')]
 
-    return data[features].values
+    # Fill any remaining NaNs
+    data = data.fillna(0)
+
+    # Return as a DataFrame
+    return data[features]
