@@ -17,7 +17,7 @@ const LandingPage = () => {
   return (
     <>
     <div
-    className="ml-[20px] p-[10px] pt-[0px]"
+    className=" ml-[200px] p-6  p-[10px] pt-[0px]"
     >
       <Navbar />
       <HeroSection></HeroSection>

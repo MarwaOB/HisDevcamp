@@ -42,7 +42,7 @@ const FileUpload = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="ml-[200px] p-6 flex min-h-screen">
       {/* Sidebar à gauche */}
  
 
@@ -51,8 +51,8 @@ const FileUpload = () => {
         <div className="flex justify-end items-center mb-8 gap-4">
           <button className="rounded-full bg-yellow-300 w-10 h-10 text-center font-bold">TY</button>
           <div>
-            <p className="font-medium text-sm">Tati</p>
-            <p className="text-xs text-gray-500">Youcef</p>
+            <p className="font-medium text-sm">ELBAR</p>
+            <p className="text-xs text-gray-500">Imane</p>
           </div>
         </div>
 

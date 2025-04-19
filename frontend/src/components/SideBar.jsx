@@ -10,7 +10,9 @@ export default function Sidebar() {
   const currentPath = location.pathname.split("/")[1] || "home";
 
   return (
-    <div className="w-[200px] ml-[10px] mt-[10px] h-screen bg-[rgb(40,136,122)] rounded flex flex-col justify-between">
+<div className="fixed m-[5px] mr-[0px]  h-screen w-[200px] bg-[rgb(40,136,122)] rounded-r flex flex-col justify-between z-50">
+  {/* ton contenu ici */}
+
       {/* Logo */}
       <div>
         <div
