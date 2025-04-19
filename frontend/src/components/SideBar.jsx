@@ -4,10 +4,36 @@ import ChartIcon from "../assets/Sales.png";
 import UserIcon from "../assets/Account.png";
 import DrahamIcon from "../assets/Draham.png";
 import LogoutIcon from "../assets/log-out.png";
+import { useNavigate } from "react-router-dom";
+
 
 export default function Sidebar() {
   const location = useLocation();
   const currentPath = location.pathname.split("/")[1] || "home";
+  const navigate = useNavigate();
+
+const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const response = await fetch("http://localhost:8000/auth/logout/", {
+      method: "POST",
+      headers: {
+        "Authorization": `Token ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user"); // Optional: If you're storing user info
+      navigate("/login");
+    } else {
+      console.error("Logout failed");
+    }
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+};
+
 
   return (
     <div className="w-[200px] ml-[10px] mt-[10px] h-screen bg-[rgb(40,136,122)] rounded flex flex-col justify-between">
@@ -24,7 +50,7 @@ export default function Sidebar() {
 
         {/* Navigation items */}
         <nav className="flex flex-col gap-3 px-2">
-          <SidebarItem icon={HomeIcon} label="Home" to="/home" active={currentPath === "home"} />
+          <SidebarItem icon={HomeIcon} label="Home" to="/predict" active={currentPath === "predict"} />
           <SidebarItem icon={ChartIcon} label="Dashboard" to="/dashboard" active={currentPath === "dashboard"} />
           <SidebarItem icon={DrahamIcon} label="Pricing" to="/pricing" active={currentPath === "pricing"} />
           <SidebarItem icon={UserIcon} label="Profil" to="/profil" active={currentPath === "profil"} />
@@ -33,7 +59,7 @@ export default function Sidebar() {
 
       {/* Footer / Disconnect */}
       <div className="px-2 pb-4 w-full">
-        <SidebarItem icon={LogoutIcon} label="Disconnect" to="/disconnect" active={currentPath === "disconnect"} />
+        <SidebarItem icon={LogoutIcon} label="Disconnect" to="/disconnect"  onClick={handleLogout} active={currentPath === "disconnect"} />
       </div>
     </div>
   );

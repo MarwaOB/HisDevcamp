@@ -1,0 +1,14 @@
+[33m26e5b5b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaroua[m[33m, [m[1;31morigin/maroua-temp[m[33m, [m[1;31morigin/maroua[m[33m, [m[1;32mmaroua-temp[m[33m)[m HEAD@{0}: reset: moving to origin/maroua
+[33m0182bc2[m[33m ([m[1;31morigin/rayane[m[33m, [m[1;32mrayane[m[33m)[m HEAD@{1}: checkout: moving from rayane to maroua
+[33m0182bc2[m[33m ([m[1;31morigin/rayane[m[33m, [m[1;32mrayane[m[33m)[m HEAD@{2}: reset: moving to origin/rayane
+[33m0182bc2[m[33m ([m[1;31morigin/rayane[m[33m, [m[1;32mrayane[m[33m)[m HEAD@{3}: checkout: moving from maroua to rayane
+[33m0182bc2[m[33m ([m[1;31morigin/rayane[m[33m, [m[1;32mrayane[m[33m)[m HEAD@{4}: reset: moving to origin/rayane
+[33m26e5b5b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaroua[m[33m, [m[1;31morigin/maroua-temp[m[33m, [m[1;31morigin/maroua[m[33m, [m[1;32mmaroua-temp[m[33m)[m HEAD@{5}: reset: moving to HEAD
+[33m26e5b5b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaroua[m[33m, [m[1;31morigin/maroua-temp[m[33m, [m[1;31morigin/maroua[m[33m, [m[1;32mmaroua-temp[m[33m)[m HEAD@{6}: checkout: moving from maroua-temp to maroua
+[33m26e5b5b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaroua[m[33m, [m[1;31morigin/maroua-temp[m[33m, [m[1;31morigin/maroua[m[33m, [m[1;32mmaroua-temp[m[33m)[m HEAD@{7}: checkout: moving from maroua to maroua-temp
+[33m26e5b5b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaroua[m[33m, [m[1;31morigin/maroua-temp[m[33m, [m[1;31morigin/maroua[m[33m, [m[1;32mmaroua-temp[m[33m)[m HEAD@{8}: commit: backend all fcts
+[33mc9b7a7d[m HEAD@{9}: checkout: moving from c9b7a7da97831b282416ea30a98b29835259d462 to maroua
+[33mc9b7a7d[m HEAD@{10}: reset: moving to origin/main
+[33mdf3db4f[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m HEAD@{11}: checkout: moving from main to origin/main
+[33mdf3db4f[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m HEAD@{12}: Branch: renamed refs/heads/master to refs/heads/main
+[33mdf3db4f[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m HEAD@{14}: commit (initial): Initial commit with Django project

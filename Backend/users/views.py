@@ -1,4 +1,3 @@
-from datetime import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -16,11 +15,14 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from dashboard.utils import generate_critical_products_graph, generate_seasonal_products_graph, generate_product_status_graph
 from django.core.cache import cache
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+
 
 
 
 class UserRegistrationView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]  # Changed from IsAuthenticated
     
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
@@ -34,32 +36,39 @@ class UserRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLoginView(APIView):
-    permission_classes = [IsAuthenticated]
-    
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = authenticate(
-                email=serializer.validated_data['email'],
-                password=serializer.validated_data['password']
-            )
+            identifier = serializer.validated_data['identifier']
+            password = serializer.validated_data['password']
+            user = None
+
+            # Try to find user by email or username
+            User = get_user_model()
+            try:
+                user_obj = User.objects.get(email=identifier)
+            except User.DoesNotExist:
+                try:
+                    user_obj = User.objects.get(username=identifier)
+                except User.DoesNotExist:
+                    return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Authenticate using the user's actual username
+            user = authenticate(username=user_obj.username, password=password)
+
             if user:
-                token, created = Token.objects.get_or_create(user=user)
-                if not created:  # Rotate token if it already existed
-                    token.delete()
-                    token = Token.objects.create(user=user)
-                
+                token, _ = Token.objects.get_or_create(user=user)
                 return Response({
                     'token': token.key,
                     'user': SafeCustomUserSerializer(user).data
                 }, status=status.HTTP_200_OK)
-            
-            return Response(
-                {'error': 'Invalid credentials'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-        
+
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserLogoutView(APIView):
     permission_classes = [IsAuthenticated]
@@ -83,6 +92,30 @@ def api_root(request):
             'admin': '/admin/',
         }
     })    
+import io
+from django.http import FileResponse
+import csv
+import io
+import csv
+import os
+import traceback
+import pandas as pd
+import joblib
+from django.core.cache import cache
+from django.http import FileResponse
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+
+import base64
+
+def encode_image_to_base64(filepath):
+    with open(filepath, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode("utf-8")
+        return f"data:image/png;base64,{encoded}"
+
 
 class PredictFromCSV(APIView):
     permission_classes = [IsAuthenticated]
@@ -90,7 +123,6 @@ class PredictFromCSV(APIView):
 
     def post(self, request, format=None):
         user = request.user
-        user.save()
 
         if not user.is_subscription_active():
             return Response({
@@ -109,13 +141,20 @@ class PredictFromCSV(APIView):
             model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../notebooks/model.pkl'))
             if not os.path.exists(model_path):
                 return Response({"error": "Model file not found."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
+
             model = joblib.load(model_path)
             y_pred = model.predict(X_test)
 
-            # Stockage local des infos pour les graphiques
             dashboard_data = []
+            result_rows = []
             for i, pred in enumerate(y_pred):
+                row = {
+                    "record_ID": int(test_df.loc[i, "record_ID"]),
+                    "sku_id": test_df.loc[i, "sku_id"],
+                    "week": test_df.loc[i, "week"],
+                    "units_sold": int(round(pred))
+                }
+                result_rows.append(row)
                 dashboard_data.append({
                     "product_id": test_df.loc[i, "sku_id"],
                     "date": pd.to_datetime(test_df.loc[i, "week"]),
@@ -124,30 +163,59 @@ class PredictFromCSV(APIView):
                     "units_sold": int(round(pred)),
                 })
 
-            # Sauvegarder les données pour usage futur (ex: cache ou base)
+            # Store dashboard data in cache
             cache_key = f'dashboard_data_user_{user.id}'
-            cache.set(cache_key, dashboard_data, timeout=3600)  # 1h de validité (modifiable)
+            cache.set(cache_key, dashboard_data, timeout=3600)
 
-            # Compte l’usage
+            # Update user prediction count
             user.predictions_count += 1
             user.save()
 
-            # Generate the graphs directly using the utils
+            # Generate backend graphs
             generate_critical_products_graph(user)
             generate_seasonal_products_graph(user)
-            generate_product_status_graph(user)  
+            generate_product_status_graph(user)
 
+            # Write CSV to binary buffer
+            text_buffer = io.StringIO()
+            writer = csv.DictWriter(text_buffer, fieldnames=["record_ID", "sku_id", "week", "units_sold"])
+            writer.writeheader()
+            writer.writerows(result_rows)
 
-            return Response({
-                "predictions": [
-                    {"record_ID": int(record_id), "units_sold": int(round(pred))}
-                    for record_id, pred in zip(test_df['record_ID'], y_pred)
-                ],
-               
-            }, status=status.HTTP_200_OK)
+            # Convert to BytesIO for FileResponse
+            bytes_buffer = io.BytesIO()
+            bytes_buffer.write(text_buffer.getvalue().encode('utf-8'))
+            bytes_buffer.seek(0)
+
+            return FileResponse(bytes_buffer, as_attachment=True, filename="predictions.csv")
 
         except Exception as e:
+            traceback.print_exc()  # Logs full error to console for debugging
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class DashboardGraphsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        graph_names = [
+            f'critical_products_user_{user.id}.png',
+            f'seasonal_products_user_{user.id}.png',
+            f'product_status_user_{user.id}.png',
+        ]
+        graph_paths = [os.path.join('media/graphs', name) for name in graph_names]
+
+        graphs_encoded = {}
+        for name, path in zip(['critical', 'seasonal', 'status'], graph_paths):
+            try:
+                with open(path, "rb") as img_file:
+                    b64 = base64.b64encode(img_file.read()).decode("utf-8")
+                    graphs_encoded[name] = f"data:image/png;base64,{b64}"
+            except FileNotFoundError:
+                graphs_encoded[name] = None
+
+        return Response({"graphs": graphs_encoded})
 
 
 class UserProfileView(APIView):
@@ -198,3 +266,6 @@ class ChooseSubscriptionPlanView(APIView):
             'message': f'Subscription updated to {selected_plan}',
             'subscription': SafeCustomUserSerializer(user).data
         }, status=status.HTTP_200_OK)
+
+
+

@@ -47,11 +47,10 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',  
 ]
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # must be at the top
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -65,7 +64,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
          'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),  
+            os.path.join(BASE_DIR, 'frontend/dist'),  
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -132,6 +131,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+CORS_ALLOW_CREDENTIALS = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
@@ -170,3 +170,31 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Replace this:
+CORS_ALLOW_ALL_ORIGINS = True  # Only use in development!
+
+# With this:
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5174",  # Your frontend URL
+    "http://127.0.0.1:5174",
+]
+
+# Ensure cookies can be sent cross-domain if needed
+CORS_ALLOW_CREDENTIALS = True
+
+# Allow necessary headers
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'access-control-allow-origin', 
+]
+

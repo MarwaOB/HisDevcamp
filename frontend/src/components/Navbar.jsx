@@ -1,11 +1,19 @@
 import React, { useState } from "react";
 import logo from "../assets/Group.png";
+import { useNavigate } from "react-router-dom";
+
 
 const Navbar = () => {
-  const [clicked, setClicked] = useState(null); // null par défaut pour éviter l'état de base
+  const [clicked, setClicked] = useState(null);
+  const navigate = useNavigate();
 
   const handleClick = (button) => {
     setClicked(button);
+    if (button === 'signIn') {
+      navigate('/signin');
+    } else if (button === 'signUp') {
+      navigate('/signup');
+    }
   };
 
   return (

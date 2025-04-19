@@ -8,11 +8,10 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = [
-            'username', 'email', 'company_name', 'phone',
+            'company_name', 'phone',
             'business_type', 'subscription_type'
         ]
-        read_only_fields = ['subscription_type', 'predictions_count']  
-
+        read_only_fields = ['username', 'email', 'subscription_type', 'predictions_count']   # Ensure username and email are read-only
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -50,12 +49,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return CustomUser.objects.create(**validated_data)
 
 class UserLoginSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
+    identifier = serializers.CharField(required=True)  # Can be email or username
     password = serializers.CharField(
         required=True,
         write_only=True,
         style={'input_type': 'password'}
     )
+
 
 class SafeCustomUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,7 +65,8 @@ class SafeCustomUserSerializer(serializers.ModelSerializer):
             'business_type', 'subscription_type',
             'is_subscription_active'
         ]
-        read_only_fields = ['is_subscription_active']
+        read_only_fields = ['username', 'email', 'is_subscription_active']  # Ensure username and email are read-only
+
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:

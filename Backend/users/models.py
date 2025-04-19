@@ -38,11 +38,8 @@ class CustomUser(AbstractUser):
         regex=r'^(05|06|07)\d{8}$',
         message="Phone number must start with 05, 06, or 07 and contain exactly 10 digits."
     )
-    phone = models.CharField(
-        max_length=10,
-        validators=[phone_regex],
-        unique=True
-    )
+    phone = models.CharField(max_length=20, unique=True, null=True, blank=True)
+
     
     SUBSCRIPTION_PLANS = {
         'FREE': {
