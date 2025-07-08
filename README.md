@@ -159,14 +159,10 @@ We welcome contributions! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
 - **DEVCAMP 3.0** - For providing the platform and inspiration
-- **Algerian Wholesale Community** - For problem insights and feedback
 - **Open Source Contributors** - For the amazing tools and libraries
 
 ---
